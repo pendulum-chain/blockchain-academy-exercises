@@ -1,9 +1,9 @@
-//! Benchmarking setup for pallet-template
+//! Benchmarking setup for pallet-amm
 
 use super::*;
 
 #[allow(unused)]
-use crate::Pallet as Template;
+use crate::Pallet as Amm;
 use frame_benchmarking::{benchmarks, whitelisted_caller};
 use frame_system::RawOrigin;
 
@@ -16,5 +16,5 @@ benchmarks! {
 		assert_eq!(Something::<T>::get(), Some(s));
 	}
 
-	impl_benchmark_test_suite!(Template, crate::mock::new_test_ext(), crate::mock::Test);
+	impl_benchmark_test_suite!(Amm, crate::mock::new_test_ext(), crate::mock::Test);
 }
