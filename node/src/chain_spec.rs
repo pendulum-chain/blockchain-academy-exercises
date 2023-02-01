@@ -1,6 +1,6 @@
 use node_template_runtime::{
 	AccountId, AssetsConfig, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, Signature,
-	SudoConfig, SystemConfig, EUR, USD, WASM_BINARY,
+	SudoConfig, SystemConfig, DOT, ETH, EUR, USD, WASM_BINARY,
 };
 use sc_service::ChainType;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -153,14 +153,23 @@ fn testnet_genesis(
 		},
 		transaction_payment: Default::default(),
 		assets: AssetsConfig {
-			assets: vec![(EUR, root_key.clone(), true, 100), (USD, root_key.clone(), true, 100)],
+			assets: vec![
+				(EUR, root_key.clone(), true, 100),
+				(USD, root_key.clone(), true, 100),
+				(ETH, root_key.clone(), true, 100),
+				(DOT, root_key.clone(), true, 100),
+			],
 			metadata: vec![
 				(EUR, b"Euro".to_vec(), b"EUR".to_vec(), 12),
 				(USD, b"US Dollars".to_vec(), b"USD".to_vec(), 12),
+				(DOT, b"Dot".to_vec(), b"DOT".to_vec(), 12),
+				(ETH, b"Eth".to_vec(), b"ETH".to_vec(), 12),
 			],
 			accounts: vec![
 				(EUR, root_key.clone(), 100_000_000_000_000),
 				(USD, root_key.clone(), 100_000_000_000_000),
+				(DOT, root_key.clone(), 100_000_000_000_000),
+				(ETH, root_key.clone(), 100_000_000_000_000),
 			],
 		},
 	}
