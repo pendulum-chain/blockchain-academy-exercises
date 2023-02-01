@@ -91,59 +91,18 @@ pub mod pallet {
 			hash: [u8; 32],
 			duration: T::BlockNumber,
 		) -> DispatchResult {
-			let who = ensure_signed(origin)?;
-			let account_id = Self::account_id();
-			let now = <frame_system::Pallet<T>>::block_number();
-
-			if LockHash::<T>::exists() {
-				Err(Error::<T>::AlreadyLocked)?
-			} else {
-				MinBlockToCancel::<T>::set(now + duration);
-				LockHash::<T>::set(hash);
-				AmountLocked::<T>::set(amount);
-
-				// Transfers from caller user to pallet's account
-				<T::Assets>::transfer(T::Dot::get(), &who, &account_id, amount, true)?;
-				Self::deposit_event(Event::LockedCoin { who, amount });
-
-				Ok(())
-			}
+			Ok(())
 		}
 
 		#[pallet::call_index(2)]
 		#[pallet::weight(10_000)]
 		pub fn unlock(origin: OriginFor<T>, secret: Vec<u8>) -> DispatchResult {
-			let who = ensure_signed(origin)?;
-			let account_id = Self::account_id();
-			let sha: [u8; 32] = hashing::sha2_256(secret.as_slice().clone());
-			let amount = AmountLocked::<T>::get();
-
-			if sha == LockHash::<T>::get() {
-				// Transfers from caller user to pallet's account
-				<T::Assets>::transfer(T::Dot::get(), &account_id, &who, amount, true)?;
-				Self::deposit_event(Event::UnlockedCoin { who });
-				Ok(())
-			} else {
-				Err(Error::<T>::HashDoesNotMatchError)?
-			}
+			Ok(())
 		}
 
 		#[pallet::call_index(3)]
 		#[pallet::weight(10_000)]
 		pub fn cancel(origin: OriginFor<T>) -> DispatchResult {
-			let who = ensure_signed(origin)?;
-			let current: T::BlockNumber = <frame_system::Pallet<T>>::block_number();
-			let account_id = Self::account_id();
-			let amount = AmountLocked::<T>::get();
-
-			if current > MinBlockToCancel::<T>::get() {
-				// Transfers back to caller user
-				<T::Assets>::transfer(T::Dot::get(), &account_id, &who, amount, true)?;
-				// Unsets the lock
-				LockHash::<T>::kill();
-				MinBlockToCancel::<T>::kill();
-				Self::deposit_event(Event::Cancelled { who });
-			}
 			Ok(())
 		}
 	}
