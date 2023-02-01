@@ -7,6 +7,7 @@ use frame_support::{
 	traits::tokens::fungibles::{Inspect, Transfer},
 	PalletId,
 };
+
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// <https://docs.substrate.io/reference/frame-pallets/>
@@ -19,6 +20,8 @@ type BalanceOf<T> =
 
 type AssetIdOf<T> =
 	<<T as Config>::Assets as Inspect<<T as frame_system::Config>::AccountId>>::AssetId;
+
+type AccountIdOf<T> = <T as frame_system::Config>::AccountId;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -73,12 +76,16 @@ pub mod pallet {
 	#[pallet::storage]
 	pub(crate) type AmountLocked<T: Config> = StorageValue<_, BalanceOf<T>, ValueQuery>;
 
+	/// Target account
+	#[pallet::storage]
+	pub(crate) type TargetAccount<T: Config> = StorageValue<_, AccountIdOf<T>, OptionQuery>;
+
 	// Errors inform users that something went wrong.
 	#[pallet::error]
 	pub enum Error<T> {
 		GenericError,
 		AlreadyLocked,
-		HashDoesNotMatchError,
+		UnlockingError,
 	}
 
 	#[pallet::call]
@@ -90,6 +97,7 @@ pub mod pallet {
 			amount: BalanceOf<T>,
 			hash: [u8; 32],
 			duration: T::BlockNumber,
+			target: AccountIdOf<T>,
 		) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 			let account_id = Self::account_id();
@@ -101,6 +109,7 @@ pub mod pallet {
 				MinBlockToCancel::<T>::set(now + duration);
 				LockHash::<T>::set(hash);
 				AmountLocked::<T>::set(amount);
+				TargetAccount::<T>::set(Some(target));
 
 				// Transfers from caller user to pallet's account
 				<T::Assets>::transfer(T::Dot::get(), &who, &account_id, amount, true)?;
@@ -117,14 +126,15 @@ pub mod pallet {
 			let account_id = Self::account_id();
 			let sha: [u8; 32] = hashing::sha2_256(secret.as_slice().clone());
 			let amount = AmountLocked::<T>::get();
+			let target = TargetAccount::<T>::get();
 
-			if sha == LockHash::<T>::get() {
+			if sha == LockHash::<T>::get() && target.is_some() {
 				// Transfers from caller user to pallet's account
-				<T::Assets>::transfer(T::Dot::get(), &account_id, &who, amount, true)?;
+				<T::Assets>::transfer(T::Dot::get(), &account_id, &target.unwrap(), amount, true)?;
 				Self::deposit_event(Event::UnlockedCoin { who });
 				Ok(())
 			} else {
-				Err(Error::<T>::HashDoesNotMatchError)?
+				Err(Error::<T>::UnlockingError)?
 			}
 		}
 
