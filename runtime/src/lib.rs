@@ -49,6 +49,7 @@ pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
 pub use pallet_amm;
+pub use pallet_atomic_swaps;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -278,6 +279,8 @@ impl pallet_sudo::Config for Runtime {
 pub const UNIT: Balance = 1_000_000_000_000;
 pub const EUR: u32 = 0;
 pub const USD: u32 = 1;
+pub const ETH: u32 = 2;
+pub const DOT: u32 = 3;
 
 parameter_types! {
 	pub const AssetDeposit: Balance = 100 * UNIT;
@@ -323,6 +326,20 @@ impl pallet_amm::Config for Runtime {
 	type PalletId = AmmPalletId;
 }
 
+parameter_types! {
+	pub const Eth: u32 = ETH;
+	pub const Dot: u32 = DOT;
+	pub const ASPalletId: PalletId = PalletId(*b"atom_swp");
+}
+
+impl pallet_atomic_swaps::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type Assets = Assets;
+	type Eth = Eth;
+	type Dot = Dot;
+	type PalletId = ASPalletId;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub struct Runtime
@@ -341,6 +358,7 @@ construct_runtime!(
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
 		Amm: pallet_amm,
+		AtomicSwaps: pallet_atomic_swaps,
 	}
 );
 

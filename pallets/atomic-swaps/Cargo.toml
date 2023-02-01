@@ -1,8 +1,8 @@
 [package]
-description = "A simple automatic market maker."
+description = "A dummy pallet for performing atomic swaps."
 edition = "2021"
 license = "Unlicense"
-name = "pallet-amm"
+name = "pallet-atomic-swaps"
 publish = false
 version = "4.0.0-dev"
 

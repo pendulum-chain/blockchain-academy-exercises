@@ -3677,6 +3677,7 @@ dependencies = [
  "frame-try-runtime",
  "pallet-amm",
  "pallet-assets",
+ "pallet-atomic-swaps",
  "pallet-aura",
  "pallet-balances",
  "pallet-grandpa",
@@ -3883,6 +3884,21 @@ dependencies = [
  "scale-info",
  "sp-runtime",
  "sp-std",
+]
+
+[[package]]
+name = "pallet-atomic-swaps"
+version = "4.0.0-dev"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-assets",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
 ]
 
 [[package]]
