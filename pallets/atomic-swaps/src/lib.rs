@@ -20,6 +20,8 @@ type BalanceOf<T> =
 type AssetIdOf<T> =
 	<<T as Config>::Assets as Inspect<<T as frame_system::Config>::AccountId>>::AssetId;
 
+type AccountIdOf<T> = <T as frame_system::Config>::AccountId;
+
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
@@ -90,6 +92,7 @@ pub mod pallet {
 			amount: BalanceOf<T>,
 			hash: [u8; 32],
 			duration: T::BlockNumber,
+			target: AccountIdOf<T>,
 		) -> DispatchResult {
 			// Account of caller
 			let who = ensure_signed(origin)?;
@@ -120,7 +123,7 @@ pub mod pallet {
 
 			// Generate a SHA256 hash of the secret (you can use hashing::sha2_256);
 			// If the hash you calculated is equal to what you savedm you are good to unlock
-			// Transfers from pallet account to the caller of the unlock
+			// Transfers from pallet account to the target account from unock
 			// Optional, emit an event
 		}
 
