@@ -20,6 +20,8 @@ type BalanceOf<T> =
 type AssetIdOf<T> =
 	<<T as Config>::Assets as Inspect<<T as frame_system::Config>::AccountId>>::AssetId;
 
+type AccountIdOf<T> = <T as frame_system::Config>::AccountId;
+
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
@@ -90,6 +92,7 @@ pub mod pallet {
 			amount: BalanceOf<T>,
 			hash: [u8; 32],
 			duration: T::BlockNumber,
+			target: AccountIdOf<T>,
 		) -> DispatchResult {
 			Ok(())
 		}
