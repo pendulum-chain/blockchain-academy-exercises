@@ -76,60 +76,18 @@ pub mod pallet {
 			eur_amount: BalanceOf<T>,
 			usd_amount: BalanceOf<T>,
 		) -> DispatchResult {
-			let who = ensure_signed(origin)?;
-
-			let account_id = Self::account_id();
-
-			<T::Assets>::transfer(T::Eur::get(), &who, &account_id, eur_amount, true)?;
-			<T::Assets>::transfer(T::Usd::get(), &who, &account_id, usd_amount, true)?;
-
-			Self::deposit_event(Event::LiquidityProvided { who, eur_amount, usd_amount });
 			Ok(())
 		}
 
 		#[pallet::call_index(1)]
 		#[pallet::weight(10_000)]
 		pub fn swap_eur_to_usd(origin: OriginFor<T>, eur_amount: BalanceOf<T>) -> DispatchResult {
-			let who = ensure_signed(origin)?;
-
-			let account_id = Self::account_id();
-
-			let eur = <T::Assets>::balance(T::Eur::get(), &account_id);
-			let usd = <T::Assets>::balance(T::Usd::get(), &account_id);
-			let product = eur.checked_mul(&usd).ok_or(Error::<T>::GenericError)?;
-
-			let new_eur = eur.checked_add(&eur_amount).ok_or(Error::<T>::GenericError)?;
-			let new_usd = product.checked_div(&new_eur).ok_or(Error::<T>::GenericError)?;
-
-			let usd_amount = usd.checked_sub(&new_usd).ok_or(Error::<T>::GenericError)?;
-
-			<T::Assets>::transfer(T::Eur::get(), &who, &account_id, eur_amount, true)?;
-			<T::Assets>::transfer(T::Usd::get(), &account_id, &who, usd_amount, true)?;
-
-			Self::deposit_event(Event::SwappedEurToUsd { who, eur_amount, usd_amount });
 			Ok(())
 		}
 
 		#[pallet::call_index(2)]
 		#[pallet::weight(10_000)]
 		pub fn swap_usd_to_eur(origin: OriginFor<T>, usd_amount: BalanceOf<T>) -> DispatchResult {
-			let who = ensure_signed(origin)?;
-
-			let account_id = Self::account_id();
-
-			let eur = <T::Assets>::balance(T::Eur::get(), &account_id);
-			let usd = <T::Assets>::balance(T::Usd::get(), &account_id);
-			let product = eur.checked_mul(&usd).ok_or(Error::<T>::GenericError)?;
-
-			let new_usd = usd.checked_add(&usd_amount).ok_or(Error::<T>::GenericError)?;
-			let new_eur = product.checked_div(&new_usd).ok_or(Error::<T>::GenericError)?;
-
-			let eur_amount = eur.checked_sub(&new_eur).ok_or(Error::<T>::GenericError)?;
-
-			<T::Assets>::transfer(T::Usd::get(), &who, &account_id, usd_amount, true)?;
-			<T::Assets>::transfer(T::Eur::get(), &account_id, &who, eur_amount, true)?;
-
-			Self::deposit_event(Event::SwappedUsdToEur { who, eur_amount, usd_amount });
 			Ok(())
 		}
 	}
